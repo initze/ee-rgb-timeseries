@@ -26,6 +26,12 @@ var rgbTs = require(
 // Landsat collection builder module: https://jdbcode.github.io/EE-LCB/
 var lcb = require('users/jstnbraaten/modules:ee-lcb.js');  
 
+// #############################################################################
+// ### SETUP Baselayers ELEMENTS ###
+// #############################################################################
+var TCVIS_2000_2019 = ee.ImageCollection('users/ingmarnitze/TCTrend_SR_2000-2019_TCVIS')
+
+
 
 // #############################################################################
 // ### GET URL PARAMS ###
@@ -172,7 +178,7 @@ var rgbPanel = ui.Panel([rgbLabel, rgbSelect], null, {stretch: 'horizontal'});
 var durationLabel = ui.Label(
   {value: 'Duration (months prior)', style: headerFont});
 var durationSlider = ui.Slider({
-  min: 1, max: 24 , value: parseInt(ui.url.get('duration')),
+  min: 1, max: 12*5 , value: parseInt(ui.url.get('duration')),
   step: 1, style: {stretch: 'horizontal'}
 });
 var durationPanel = ui.Panel(
@@ -591,12 +597,14 @@ function renderGraphics(coords) {
   var aoiBox = point.buffer(regionWidthSlider.getValue()*1000/2);
   
   // Clear previous point from the Map.
+  /*
   map.layers().forEach(function(el) {
     map.layers().remove(el);
   });
+  */
 
   // Add new point to the Map.
-  map.addLayer(aoiCircle, {color: AOI_COLOR});
+  map.addLayer(aoiCircle, {color: AOI_COLOR}, 'seleted locations');
   map.centerObject(aoiCircle, 14);
 
   // Get collection options.
@@ -765,6 +773,7 @@ map.setOptions('SATELLITE');
 map.setControlVisibility(
   {layerList: true, fullscreenControl: false, zoomControl: false});
 //map.centerObject(ee.Geometry.Point([-122.91966, 44.24135]), 14);
+map.addLayer(TCVIS_2000_2019, {}, 'TCVIS 2000-2019')
 
 ui.root.clear();
 ui.root.add(splitPanel);
@@ -777,8 +786,4 @@ if(ui.url.get('run')) {
 }
 
 
-// #############################################################################
-// ### SETUP Baselayers ELEMENTS ###
-// #############################################################################
-var TCVIS_2000_2019 = ee.ImageCollection('users/ingmarnitze/TCTrend_SR_2000-2019_TCVIS')
-map.addLayer(TCVIS_2000_2019, {}, 'TCVIS 2000-2019')
+
