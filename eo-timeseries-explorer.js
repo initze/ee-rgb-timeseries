@@ -763,7 +763,7 @@ map.onClick(handleMapClick);
 map.style().set('cursor', 'crosshair');
 map.setOptions('SATELLITE');
 map.setControlVisibility(
-  {layerList: false, fullscreenControl: false, zoomControl: false});
+  {layerList: true, fullscreenControl: false, zoomControl: false});
 //map.centerObject(ee.Geometry.Point([-122.91966, 44.24135]), 14);
 
 ui.root.clear();
@@ -775,3 +775,10 @@ if(ui.url.get('run')) {
   COORDS = [ui.url.get('lon'), ui.url.get('lat')];
   renderGraphics(COORDS);
 }
+
+
+// #############################################################################
+// ### SETUP Baselayers ELEMENTS ###
+// #############################################################################
+var TCVIS_2000_2019 = ee.ImageCollection('users/ingmarnitze/TCTrend_SR_2000-2019_TCVIS')
+map.addLayer(TCVIS_2000_2019, {}, 'TCVIS 2000-2019')
