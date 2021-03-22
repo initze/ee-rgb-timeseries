@@ -13,6 +13,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * adaptations: Ingmar Nitze
+ *
  */
 
 // #############################################################################
@@ -61,9 +64,21 @@ var initRgb = 'SWIR1/NIR/GREEN';
 var rgbUrl = ui.url.get('rgb', initRgb);
 ui.url.set('rgb', rgbUrl);
 
-var initDuration = 12;
-var durationUrl = ui.url.get('duration', initDuration);
-ui.url.set('duration', durationUrl);
+
+// FIX HERE
+//var initEndDate = ee.Date(new Date());
+var initEndDate = '2021-03-01';
+var endDateUrl = ui.url.get('end_date', initEndDate);
+ui.url.set('end_date', endDateUrl);
+
+//var initStartDate = initEndDate.advance(2, 'years');
+var initStartDate = '2019-01-01';
+var startDateUrl = ui.url.get('start_date', initStartDate);
+ui.url.set('start_date', startDateUrl);
+
+//var initDuration = 12;
+//var durationUrl = ui.url.get('duration', initDuration);
+//ui.url.set('duration', durationUrl);
 
 var initCloud = 30;
 var cloudUrl = ui.url.get('cloud', initCloud);
@@ -175,6 +190,7 @@ var rgbSelect = ui.Select({
 var rgbPanel = ui.Panel([rgbLabel, rgbSelect], null, {stretch: 'horizontal'});
 
 // Duration.
+/*
 var durationLabel = ui.Label(
   {value: 'Duration (months prior)', style: headerFont});
 var durationSlider = ui.Slider({
@@ -183,6 +199,27 @@ var durationSlider = ui.Slider({
 });
 var durationPanel = ui.Panel(
   [durationLabel, durationSlider], null, {stretch: 'horizontal'});
+*/
+
+// Start and End Dates
+//var endDate = ee.Date(new Date());
+//var startDate = endDate.advance(2, 'year');
+var startDateLabel = ui.Label(
+  {value: 'Start date', style: headerFont});
+var startDateBox = ui.Textbox(
+  {placeholder:ui.url.get('start_date'), value:ui.url.get('start_date'), style:{stretch:'horizontal'}});
+var startDatePanel = ui.Panel(
+  [startDateLabel, startDateBox], ui.Panel.Layout.flow('vertical', true));
+
+var endDateLabel = ui.Label(
+  {value: 'End date', style: headerFont});
+var endDateBox = ui.Textbox(
+  {placeholder:ui.url.get('end_date'), value:ui.url.get('end_date'), style:{stretch:'horizontal'}});
+var endDatePanel = ui.Panel(
+  [endDateLabel, endDateBox], ui.Panel.Layout.flow('vertical', true));
+
+var datePanel = ui.Panel(
+  [startDatePanel, endDatePanel], ui.Panel.Layout.flow('horizontal', false));
 
 // Cloud threshold.
 var cloudLabel = ui.Label(
@@ -611,9 +648,11 @@ function renderGraphics(coords) {
 
   var cloudThresh = cloudSlider.getValue();
   var datasetId = sensorInfo[sensor]['id'];
-  var endDate = new Date();
-  var startDate = ee.Date(endDate)
-    .advance(-parseInt(durationSlider.getValue()), 'months');
+  //var endDate = new Date();
+  var endDate = endDateBox.getValue();
+  var startDate = startDateBox.getValue();
+  //var startDate = ee.Date(endDate)
+  //  .advance(-parseInt(durationSlider.getValue()), 'months');
 
   // Build the collection.
   var col;
@@ -665,7 +704,9 @@ function setParams() {
   ui.url.set('sensor', sensorSelect.getValue());
   ui.url.set('index', indexSelect.getValue());
   ui.url.set('rgb', rgbSelect.getValue());
-  ui.url.set('duration', durationSlider.getValue());
+  ui.url.set('start_date', startDateBox.getValue()); ////////////////
+  ui.url.set('end_date', endDateBox.getValue()); ////////////////
+  //ui.url.set('duration', durationSlider.getValue());
   ui.url.set('cloud', cloudSlider.getValue());
   ui.url.set('chipwidth', regionWidthSlider.getValue());
 }   
@@ -745,7 +786,10 @@ controlElements.add(optionsLabel);
 controlElements.add(sensorPanel);
 controlElements.add(indexPanel);
 controlElements.add(rgbPanel);
-controlElements.add(durationPanel);
+//controlElements.add(durationPanel);
+controlElements.add(startDatePanel);
+controlElements.add(endDatePanel);
+//controlElements.add(datePanel);
 controlElements.add(cloudPanel);
 controlElements.add(regionWidthPanel);
 controlElements.add(submitButton);
@@ -762,7 +806,9 @@ controlButton.onClick(controlButtonHandler);
 sensorSelect.onChange(optionChange);
 rgbSelect.onChange(optionChange);
 indexSelect.onChange(optionChange);
-durationSlider.onChange(optionChange);
+//durationSlider.onChange(optionChange);
+startDateBox.onChange(optionChange);
+endDateBox.onChange(optionChange);
 cloudSlider.onChange(optionChange);
 regionWidthSlider.onChange(optionChange);
 submitButton.onClick(handleSubmitClick);
